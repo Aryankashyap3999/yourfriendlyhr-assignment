@@ -23,4 +23,4 @@ no extra metadata (like "primary guardian") is required beyond
 - `Students.Primary Parent` → this module (single, for the "who do we call
   first" case).
 - This module's `Students` field → the reverse, for "who can see this child"
-  (used by [[getParentStudent]] — see [../functions/getParentStudent.deluge](../functions/getParentStudent.deluge) and [../../docs/security.md](../../docs/security.md)).
+  (used by [`getParentStudent`](../functions/getParentStudent.deluge) — see also [../../docs/security.md](../../docs/security.md)).

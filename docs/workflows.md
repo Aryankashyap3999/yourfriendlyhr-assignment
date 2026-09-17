@@ -31,7 +31,7 @@ Lead Status -> Converted ◄──────────┘
 ```
 
 Trigger: field update on `Admissions.Decision`.
-Function: [[createStudentFromAdmission]] (calls `generateStudentId`, then
+Function: [`createStudentFromAdmission`](../crm/functions/createStudentFromAdmission.deluge) (calls `generateStudentId`, then
 creates the Student + the first Student Academic Enrollment in one place, so
 "confirming an admission always produces a consistent Student + enrollment
 pair" is enforced in one function rather than trusted to whoever clicks
@@ -148,5 +148,5 @@ policy is a one-field edit, not a code change.
 | `validatePayment` | reject non-positive or overpaying payments | Payment form workflow |
 | `calculateOutstandingFees` | recompute Amount Collected / Outstanding on a Fee | Payment created/edited workflow |
 | `updatePaymentStatus` | set Fee.Payment Status from collected vs total | same, right after `calculateOutstandingFees` |
-| `getParentStudent` | resolve Parent -> their Student(s), and the reverse check used by security | Creator pages, low-attendance alert, [[security]] |
+| `getParentStudent` | resolve Parent -> their Student(s), and the reverse check used by security | Creator pages, low-attendance alert, [security.md](security.md) |
 | `sendLowAttendanceAlert` | compose and send the alert email | Low attendance alert workflow |

@@ -14,7 +14,7 @@ confirm/reject decision and what it produces.
 | Decision | Picklist | Yes | Pending (default) / Confirmed / Rejected |
 | Decision Date | Date | No | set automatically when Decision changes from Pending |
 | Rejection Reason | Text | No | required if Decision = Rejected |
-| Student (created) | Lookup → Students | No | populated by [[createStudentFromAdmission]] on confirmation, read-only |
+| Student (created) | Lookup → Students | No | populated by [`createStudentFromAdmission`](../functions/createStudentFromAdmission.deluge) on confirmation, read-only |
 
 ## Validation rules
 
