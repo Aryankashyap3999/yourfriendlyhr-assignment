@@ -1,0 +1,23 @@
+// Function: generateStudentId
+// Responsibility: produce the next unique Student ID for a given year.
+// Format: STU-<academic_year_start>-<00001>, zero-padded to 5 digits.
+// Called by: createStudentFromAdmission.deluge
+//
+// Collision safety: COQL count against Students is read at call time and
+// the insert of the Student record (with Student ID as a unique field)
+// is what actually prevents a collision if two admissions are confirmed in
+// the same instant — this function only picks the next likely number,
+// the uniqueness constraint on the field is the real guarantee.
+
+string generateStudentId(int yearStart)
+{
+	existing_count = zoho.crm.coql(
+		"select count(id) from Students where Admission_Date between '"
+		+ yearStart + "-01-01' and '" + yearStart + "-12-31'"
+	);
+
+	next_seq = existing_count + 1;
+	seq_padded = next_seq.toString().leftPad(5, "0");
+
+	return "STU-" + yearStart + "-" + seq_padded;
+}

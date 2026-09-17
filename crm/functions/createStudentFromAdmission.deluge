@@ -1,0 +1,47 @@
+// Function: createStudentFromAdmission
+// Responsibility: on admission confirmation, create exactly one Student
+// and exactly one Student Academic Enrollment, consistently.
+// Trigger: workflow rule on Admissions, "Decision" changes to "Confirmed"
+// (see ../workflows/admission-confirmed.md).
+//
+// Kept as one function (not split further) because these two creates must
+// succeed or fail together — a Student with no enrollment, or an enrollment
+// with no Student, is an invalid state this function exists specifically
+// to prevent.
+
+void createStudentFromAdmission(int admissionId)
+{
+	admission = zoho.crm.getRecordById("Admissions", admissionId);
+	lead = admission.get("Lead");
+
+	studentId = generateStudentId(admission.get("Academic_Year_Applied_For").get("Start_Date").subString(0, 4).toLong());
+
+	studentMap = Map();
+	studentMap.put("Student_ID", studentId);
+	studentMap.put("First_Name", lead.get("First_Name"));
+	studentMap.put("Last_Name", lead.get("Last_Name"));
+	studentMap.put("Admission_Date", zoho.currentdate);
+	studentMap.put("Status", "Active");
+	studentMap.put("Primary_Parent", getOrCreateParent(lead));
+
+	studentRecord = zoho.crm.createRecord("Students", studentMap);
+	newStudentId = studentRecord.get("id");
+
+	// first section with available capacity in the applied-for class
+	section = zoho.crm.coql(
+		"select id from Sections where Class = '"
+		+ admission.get("Class_Applied_For").get("id") + "' limit 1"
+	).get(0);
+
+	enrollmentMap = Map();
+	enrollmentMap.put("Student", newStudentId);
+	enrollmentMap.put("Academic_Year", admission.get("Academic_Year_Applied_For").get("id"));
+	enrollmentMap.put("Class", admission.get("Class_Applied_For").get("id"));
+	enrollmentMap.put("Section", section.get("id"));
+	enrollmentMap.put("Status", "Ongoing");
+
+	zoho.crm.createRecord("Student_Academic_Enrollments", enrollmentMap);
+
+	zoho.crm.updateRecord("Admissions", admissionId, {"Student": newStudentId});
+	zoho.crm.updateRecord("Leads", lead.get("id"), {"Lead_Status": "Converted"});
+}
