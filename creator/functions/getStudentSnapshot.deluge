@@ -1,0 +1,46 @@
+// Creator function: getStudentSnapshot
+// Responsibility: the one call the Student Dashboard page makes. Checks
+// authorization, then assembles profile + attendance % + exam results +
+// fee status for one student, via the CRM connection.
+// Called by: creator/pages/student-dashboard.md, on page/section load.
+//
+// This is the Dependency Inversion seam mentioned in docs/architecture.md:
+// the page only knows "give me this student's snapshot" — it doesn't know
+// or care that this means five separate CRM lookups.
+
+map getStudentSnapshot(int studentId)
+{
+	parentEmail = zoho.loginuser;
+
+	authorized = zoho.crm.functions("isParentAuthorizedForStudent", {"parentEmail": parentEmail, "studentId": studentId}, "crm_connection");
+
+	if (authorized != true)
+	{
+		return {"authorized": false};
+	}
+
+	student = zoho.crm.getRecords("Students", {"criteria": "id == " + studentId}, "crm_connection").get(0);
+
+	enrollment = zoho.crm.getRecords("Student_Academic_Enrollments",
+		{"criteria": "(Student == " + studentId + ") && (Academic_Year.Is_Current == true)"},
+		"crm_connection").get(0);
+
+	attendancePct = zoho.crm.functions("calculateAttendancePercentage", {"enrollmentId": enrollment.get("id")}, "crm_connection");
+
+	fee = zoho.crm.getRecords("Fees",
+		{"criteria": "Student_Academic_Enrollment == " + enrollment.get("id")},
+		"crm_connection").get(0);
+
+	payments = zoho.crm.getRecords("Payments",
+		{"criteria": "Fee == " + fee.get("id")},
+		"crm_connection");
+
+	return {
+		"authorized": true,
+		"student": student,
+		"enrollment": enrollment,
+		"attendance_percentage": attendancePct,
+		"fee": fee,
+		"payments": payments
+	};
+}
