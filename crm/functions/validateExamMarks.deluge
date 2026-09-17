@@ -1,0 +1,32 @@
+// Function: validateExamMarks
+// Responsibility: reject an exam result before insert if marks are out of
+// range, the subject doesn't belong to the exam's class, or it's a
+// duplicate (Examination, Student Academic Enrollment, Subject).
+// Called by: workflow on Examination Results "before insert".
+
+void validateExamMarks(int examId, int enrollmentId, int subjectId, double marksObtained, double maxMarks)
+{
+	if (marksObtained < 0 || marksObtained > maxMarks)
+	{
+		throw "Marks obtained must be between 0 and " + maxMarks + ".";
+	}
+
+	exam = zoho.crm.getRecordById("Examinations", examId);
+	subject = zoho.crm.getRecordById("Subjects", subjectId);
+
+	if (subject.get("Class").get("id") != exam.get("Class").get("id"))
+	{
+		throw "Selected subject is not offered for this examination's class.";
+	}
+
+	duplicate = zoho.crm.coql(
+		"select id from Examination_Results where Examination = '" + examId
+		+ "' and Student_Academic_Enrollment = '" + enrollmentId
+		+ "' and Subject = '" + subjectId + "'"
+	);
+
+	if (duplicate.size() > 0)
+	{
+		throw "A result for this student, subject and examination already exists.";
+	}
+}
