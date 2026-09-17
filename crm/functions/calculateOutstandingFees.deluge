@@ -1,0 +1,27 @@
+// Function: calculateOutstandingFees
+// Responsibility: recompute Amount Collected and Outstanding Amount on a
+// Fee from its Payments. The only place these two fields are ever written.
+// Called by: workflow on Payments "after insert/edit/delete".
+
+void calculateOutstandingFees(int feeId)
+{
+	fee = zoho.crm.getRecordById("Fees", feeId);
+
+	collected = zoho.crm.coql(
+		"select sum(Amount) as total from Payments where Fee = '" + feeId + "'"
+	).get(0).get("total");
+
+	if (collected == null)
+	{
+		collected = 0;
+	}
+
+	outstanding = fee.get("Total_Fee") - collected;
+
+	zoho.crm.updateRecord("Fees", feeId, {
+		"Amount_Collected": collected,
+		"Outstanding_Amount": outstanding
+	});
+
+	updatePaymentStatus(feeId, fee.get("Total_Fee"), collected);
+}

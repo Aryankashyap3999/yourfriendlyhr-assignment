@@ -65,7 +65,17 @@ module, no polling job, just one more step after attendance is validated.
 scan over every student — cost stays proportional to attendance actually
 taken that day, not total student count.
 
-## 7. No caching, no custom auth, no sync job
+## 7. Overpayment is blocked by default, not silently allowed
+
+**Decision**: `validatePayment` rejects a payment that would push
+`Amount Collected` above `Total Fee`, unless a single org-wide custom
+setting (`Allow Fee Overpayment`) is turned on.
+**Why**: silently accepting an overpayment (refund owed, or a data-entry
+typo) is worse than a clear rejection at entry time; a school that
+genuinely wants to accept advance payments can flip one setting rather than
+this needing a code change.
+
+## 8. No caching, no custom auth, no sync job
 
 **Decision**: explicitly not built — see [architecture.md](architecture.md#what-was-deliberately-not-built).
 **Why**: each would solve a problem this system doesn't have at its expected

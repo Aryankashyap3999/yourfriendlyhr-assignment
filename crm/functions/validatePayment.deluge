@@ -1,0 +1,21 @@
+// Function: validatePayment
+// Responsibility: reject a payment before insert if the amount is not
+// positive, or if it would overpay the Fee (unless overpayment is
+// explicitly allowed by org setting).
+// Called by: workflow on Payments "before insert".
+
+void validatePayment(int feeId, double amount)
+{
+	if (amount <= 0)
+	{
+		throw "Payment amount must be greater than zero.";
+	}
+
+	fee = zoho.crm.getRecordById("Fees", feeId);
+	allowOverpay = zoho.crm.getOrgVariable("Allow_Fee_Overpayment"); // default false
+
+	if (allowOverpay != true && amount > fee.get("Outstanding_Amount"))
+	{
+		throw "Payment amount exceeds the outstanding fee of " + fee.get("Outstanding_Amount") + ".";
+	}
+}
