@@ -1,0 +1,44 @@
+// Function: calculateStudentPerformance
+// Responsibility: aggregate marks for one of three views — a student's
+// overall % in an exam, a class's average in a subject, or a class's
+// subject-wise averages — selected by which arguments are passed.
+// Called by: reports, Creator.
+//
+// Kept as one function with a mode flag rather than three near-identical
+// functions, because all three are the same shape (sum obtained / sum max
+// over a filtered set of Examination Results) and the only real variation
+// is the COQL filter.
+
+map calculateStudentPerformance(string mode, int examId, int enrollmentId, int subjectId)
+{
+	filter = "Examination = '" + examId + "'";
+
+	if (mode == "student_total")
+	{
+		filter = filter + " and Student_Academic_Enrollment = '" + enrollmentId + "'";
+	}
+	else if (mode == "class_subject_average")
+	{
+		filter = filter + " and Subject = '" + subjectId + "'";
+	}
+	// mode == "class_all_subjects": no extra filter, grouped by Subject below
+
+	if (mode == "class_all_subjects")
+	{
+		rows = zoho.crm.coql(
+			"select Subject, sum(Marks_Obtained) as obtained, sum(Max_Marks) as max from Examination_Results where "
+			+ filter + " group by Subject"
+		);
+		return {"by_subject": rows};
+	}
+
+	row = zoho.crm.coql(
+		"select sum(Marks_Obtained) as obtained, sum(Max_Marks) as max from Examination_Results where " + filter
+	).get(0);
+
+	obtained = row.get("obtained");
+	maxTotal = row.get("max");
+	percentage = maxTotal > 0 ? (obtained / maxTotal) * 100 : 0;
+
+	return {"obtained": obtained, "max": maxTotal, "percentage": percentage};
+}
