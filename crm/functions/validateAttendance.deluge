@@ -1,0 +1,30 @@
+// Function: validateAttendance
+// Responsibility: reject an attendance submission before insert if it's a
+// duplicate or targets an enrollment that isn't in the current academic year.
+// Called by: workflow on Attendance "before insert" (see
+// ../workflows/attendance-submitted.md).
+//
+// The (Student Academic Enrollment, Date) uniqueness is also a platform
+// validation rule — this function exists to give a specific, actionable
+// error message rather than a generic constraint failure. See
+// docs/decisions.md #4 for why both exist.
+
+void validateAttendance(int enrollmentId, string attendanceDate)
+{
+	enrollment = zoho.crm.getRecordById("Student_Academic_Enrollments", enrollmentId);
+
+	if (enrollment.get("Academic_Year").get("Is_Current") != true)
+	{
+		throw "Attendance can only be recorded for the current academic year.";
+	}
+
+	duplicate = zoho.crm.coql(
+		"select id from Attendance where Student_Academic_Enrollment = '"
+		+ enrollmentId + "' and Date = '" + attendanceDate + "'"
+	);
+
+	if (duplicate.size() > 0)
+	{
+		throw "Attendance for this student on " + attendanceDate + " is already recorded.";
+	}
+}
