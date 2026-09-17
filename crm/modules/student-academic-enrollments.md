@@ -14,6 +14,7 @@ answerable without ever overwriting a prior year's placement.
 | Section | Lookup → Sections | Yes | |
 | Roll Number | Text | No | |
 | Status | Picklist | Yes | Ongoing / Promoted / Repeated / Left |
+| Last Low Attendance Alert Date | Date | No | set by the low-attendance-alert workflow; prevents alerting the same parent more than once a day. Naturally resets each year since it lives on the year's enrollment record. |
 
 ## Validation rules
 

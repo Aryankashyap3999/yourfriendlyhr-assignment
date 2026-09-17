@@ -1,0 +1,55 @@
+// Function: sendLowAttendanceAlert
+// Responsibility: if a student's attendance just dropped below the
+// configured threshold, and no alert has gone out today for them, email
+// the linked parent. Nothing else — the percentage math lives in
+// calculateAttendancePercentage, the parent lookup lives in
+// getParentStudent; this function only decides "should we notify, and
+// send if so".
+// Called by: workflow on Attendance "after insert" (see
+// ../workflows/low-attendance-alert.md).
+
+void sendLowAttendanceAlert(int enrollmentId)
+{
+	threshold = zoho.crm.getOrgVariable("Attendance_Alert_Threshold"); // default 75
+
+	if (threshold == null)
+	{
+		threshold = 75;
+	}
+
+	percentage = calculateAttendancePercentage(enrollmentId);
+
+	if (percentage >= threshold)
+	{
+		return; // above threshold, nothing to do
+	}
+
+	enrollment = zoho.crm.getRecordById("Student_Academic_Enrollments", enrollmentId);
+
+	if (enrollment.get("Last_Low_Attendance_Alert_Date") == zoho.currentdate)
+	{
+		return; // already alerted today, don't spam
+	}
+
+	student = enrollment.get("Student");
+	parentEmail = student.get("Primary_Parent").get("Email");
+
+	if (parentEmail == null)
+	{
+		return; // no parent on file -> nothing to send, nothing to crash on
+	}
+
+	sendmail
+	[
+		from: zoho.adminuserid
+		to: parentEmail
+		subject: "Attendance alert for " + student.get("First_Name")
+		message: student.get("First_Name") + "'s attendance this year is "
+			+ percentage.round(1) + "%, below the school's " + threshold
+			+ "% threshold. Please contact the school office if you have questions."
+	];
+
+	zoho.crm.updateRecord("Student_Academic_Enrollments", enrollmentId, {
+		"Last_Low_Attendance_Alert_Date": zoho.currentdate
+	});
+}
