@@ -19,13 +19,13 @@ before any section below renders.
 
 ### Attendance
 - Current-year attendance percentage
-  ([[calculateAttendancePercentage]])
+  ([`calculateAttendancePercentage`](../../crm/functions/calculateAttendancePercentage.deluge))
 - Recent attendance list (last 30 days: date, status)
 
 ### Examination Results
 - List of Examinations the student has results for, current academic year
 - Per examination: subject-wise marks, and the student's overall %
-  ([[calculateStudentPerformance]], mode `student_total`)
+  ([`calculateStudentPerformance`](../../crm/functions/calculateStudentPerformance.deluge), mode `student_total`)
 
 ### Fees
 - Total Fee, Amount Collected, Outstanding Amount, Payment Status

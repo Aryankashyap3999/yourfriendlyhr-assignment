@@ -48,7 +48,7 @@ The permanent identity record. Deliberately thin — academic placement is
 
 | Field | Notes |
 |---|---|
-| Student ID | unique, system-generated, format `STU-<YYYY>-<00001>` — see [[generateStudentId]] in workflows.md |
+| Student ID | unique, system-generated, format `STU-<YYYY>-<00001>` — see [`generateStudentId`](../crm/functions/generateStudentId.deluge) |
 | First / Last Name | |
 | Date of Birth | |
 | Gender | |
@@ -131,7 +131,7 @@ class/section" for a student = the enrollment where Academic Year.Is Current
 | Marked By | lookup -> Teachers |
 
 Uniqueness rule: one record per (Student Academic Enrollment, Date) — see
-[[validateAttendance]] in workflows.md.
+[`validateAttendance`](../crm/functions/validateAttendance.deluge).
 
 ### Examinations (custom)
 | Field | Notes |
@@ -151,7 +151,7 @@ Uniqueness rule: one record per (Student Academic Enrollment, Date) — see
 | Marks Obtained | `0 <= Marks Obtained <= Max Marks` |
 
 Uniqueness rule: one record per (Examination, Student Academic Enrollment,
-Subject) — see [[validateExamMarks]] in workflows.md.
+Subject) — see [`validateExamMarks`](../crm/functions/validateExamMarks.deluge).
 
 ### Fees (custom)
 The fee plan for a student for an academic year — not a payment.
@@ -198,6 +198,6 @@ These are computed by Deluge, never entered manually (Open/Closed +
 Dependency Inversion in practice — the calculation rule lives in one
 function, not copy-pasted at every entry point):
 
-- Attendance percentage — [[calculateAttendancePercentage]]
-- Exam performance (subject/class average, student total %) — [[calculateStudentPerformance]]
-- Fee collected / outstanding / status — [[calculateOutstandingFees]], [[updatePaymentStatus]]
+- Attendance percentage — [`calculateAttendancePercentage`](../crm/functions/calculateAttendancePercentage.deluge)
+- Exam performance (subject/class average, student total %) — [`calculateStudentPerformance`](../crm/functions/calculateStudentPerformance.deluge)
+- Fee collected / outstanding / status — [`calculateOutstandingFees`](../crm/functions/calculateOutstandingFees.deluge), [`updatePaymentStatus`](../crm/functions/updatePaymentStatus.deluge)
