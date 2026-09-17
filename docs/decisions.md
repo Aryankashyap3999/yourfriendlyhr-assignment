@@ -81,3 +81,20 @@ this needing a code change.
 **Why**: each would solve a problem this system doesn't have at its expected
 scale (a single school). Adding them now would be optimizing before there's
 a measured need.
+
+## 9. Two ways to get attendance percentage — reporting vs. point checks
+
+**Decision**: `Attendance Percentage` exists both as a native rollup/formula
+field on Student Academic Enrollments (added when building reports) and as
+`calculateAttendancePercentage` in Deluge (added earlier for the parent
+dashboard and the low-attendance alert).
+**Why not just one**: a management report that needs to filter/sort
+hundreds of students by "below 75%" needs a real, queryable field — a
+Deluge function can't be a report filter. A single real-time check (one
+student, right after one attendance save) doesn't need a stored field at
+all, and using the rollup there would mean reasoning about the platform's
+rollup-recalculation timing instead of just computing the answer. Each path
+uses the tool that actually fits its own access pattern; this is judged
+worth the duplication because the two are recomputed by different
+mechanisms (CRM's own rollup engine vs. an explicit call) rather than one
+being a manually-synced copy of the other that could drift.
