@@ -1,0 +1,42 @@
+// Function: calculateAttendancePercentage
+// Responsibility: compute a student's attendance % for an academic year,
+// on demand. Not stored anywhere — recomputed whenever asked, so it can
+// never go stale.
+// Called by: reports, Creator (via getStudentSnapshot), the low-attendance
+// alert workflow.
+//
+// Half Day counts as 0.5 present; Leave counts as absent (school policy —
+// change here only, nothing else references the weighting).
+
+double calculateAttendancePercentage(int enrollmentId)
+{
+	rows = zoho.crm.coql(
+		"select Status, count(id) as cnt from Attendance where Student_Academic_Enrollment = '"
+		+ enrollmentId + "' group by Status"
+	);
+
+	total = 0;
+	presentWeighted = 0.0;
+
+	for each row in rows
+	{
+		cnt = row.get("cnt");
+		total = total + cnt;
+
+		if (row.get("Status") == "Present")
+		{
+			presentWeighted = presentWeighted + cnt;
+		}
+		else if (row.get("Status") == "Half Day")
+		{
+			presentWeighted = presentWeighted + (cnt * 0.5);
+		}
+	}
+
+	if (total == 0)
+	{
+		return 100.0; // no attendance taken yet -> nothing to flag
+	}
+
+	return (presentWeighted / total) * 100;
+}
