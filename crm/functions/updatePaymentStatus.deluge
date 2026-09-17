@@ -1,0 +1,23 @@
+// Function: updatePaymentStatus
+// Responsibility: set Fee.Payment Status from the totals already computed
+// by calculateOutstandingFees. Kept separate from that function because
+// "how much is owed" and "what label do we show" are different decisions
+// (the label rule is the one most likely to change independently — e.g. a
+// future "Overdue" status based on due date).
+// Called by: calculateOutstandingFees.deluge, right after it saves totals.
+
+void updatePaymentStatus(int feeId, double totalFee, double collected)
+{
+	status = "Pending";
+
+	if (collected >= totalFee && totalFee > 0)
+	{
+		status = "Paid";
+	}
+	else if (collected > 0)
+	{
+		status = "Partially Paid";
+	}
+
+	zoho.crm.updateRecord("Fees", feeId, {"Payment_Status": status});
+}
