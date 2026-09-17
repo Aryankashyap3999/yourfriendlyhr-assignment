@@ -1,0 +1,32 @@
+// Function: getParentStudent
+// Responsibility: the single place that answers "which students can this
+// parent see" and "may this parent see this specific student". Every
+// other piece of parent-facing access control (Creator pages, the
+// low-attendance alert) calls this instead of re-deriving the mapping.
+// Called by: Creator security check, Creator page data-fetch,
+// sendLowAttendanceAlert.
+
+// Returns the list of Student ids linked to the given parent email.
+list getStudentsForParent(string parentEmail)
+{
+	parent = zoho.crm.coql(
+		"select id from Parents_Guardians where Email = '" + parentEmail + "' limit 1"
+	);
+
+	if (parent.size() == 0)
+	{
+		return list(); // unknown parent -> no access, not an error
+	}
+
+	parentRecord = zoho.crm.getRecordById("Parents_Guardians", parent.get(0).get("id"));
+	return parentRecord.get("Students"); // multi-lookup field -> list of Student ids
+}
+
+// Returns true only if studentId is one of parentEmail's linked students.
+// This is the actual authorization check — every Creator data-fetch must
+// call this before returning anything about a student.
+boolean isParentAuthorizedForStudent(string parentEmail, int studentId)
+{
+	studentIds = getStudentsForParent(parentEmail);
+	return studentIds.contains(studentId);
+}
