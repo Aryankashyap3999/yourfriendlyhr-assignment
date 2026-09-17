@@ -1,0 +1,27 @@
+// Function: getOrCreateParent
+// Responsibility: resolve the Parent/Guardian for a Lead's contact email,
+// creating one only if it doesn't already exist (covers a second child
+// from the same parent being admitted later without duplicating the parent).
+// Called by: createStudentFromAdmission.deluge
+
+int getOrCreateParent(map lead)
+{
+	parentEmail = lead.get("Email");
+
+	existing = zoho.crm.coql(
+		"select id from Parents_Guardians where Email = '" + parentEmail + "' limit 1"
+	);
+
+	if (existing.size() > 0)
+	{
+		return existing.get(0).get("id");
+	}
+
+	parentMap = Map();
+	parentMap.put("Name", lead.get("Company"));
+	parentMap.put("Email", parentEmail);
+	parentMap.put("Phone", lead.get("Phone"));
+
+	created = zoho.crm.createRecord("Parents_Guardians", parentMap);
+	return created.get("id");
+}
