@@ -15,6 +15,8 @@ answerable without ever overwriting a prior year's placement.
 | Roll Number | Text | No | |
 | Status | Picklist | Yes | Ongoing / Promoted / Repeated / Left |
 | Last Low Attendance Alert Date | Date | No | set by the low-attendance-alert workflow; prevents alerting the same parent more than once a day. Naturally resets each year since it lives on the year's enrollment record. |
+| Present Count, Half Day Count, Total Attendance Count | Rollup (count, filtered) | — | native CRM rollups over the related Attendance list, used so reports can filter/sort by attendance without a per-record Deluge call — see [attendance.md](attendance.md) |
+| Attendance Percentage | Formula: `(Present_Count + Half_Day_Count*0.5) / Total_Attendance_Count * 100`, 100 if Total = 0 | — | reporting/sorting copy of the same figure [[calculateAttendancePercentage]] computes on demand; kept in sync by the platform's own rollup mechanism, not by us — see [../../docs/decisions.md](../../docs/decisions.md#9-two-ways-to-get-attendance-percentage) |
 
 ## Validation rules
 
